@@ -26,6 +26,7 @@ interface ContentPanelProps {
   onEnterAR: () => void;
   onUpdateOpenness: (amount: number) => void;
   onUpdatePanelCount: (count: number) => void;
+  onToggleViewLock: () => void;
 }
 
 
@@ -47,12 +48,13 @@ export const ContentPanel = ({
   onEnterAR,
   onUpdateOpenness,
   onUpdatePanelCount,
+  onToggleViewLock,
 }: ContentPanelProps) => {
 
   const currentTab = TABS.find(t => t.id === activeTab);
 
   return (
-    <div 
+    <div
       className={`
         w-[350px] bg-white border-r border-gray-200 flex flex-col
         transition-all duration-300 ease-in-out z-[100] shadow-lg
@@ -130,6 +132,8 @@ export const ContentPanel = ({
           <SettingsTab
             showMeasurements={config.showMeasurements}
             onToggleMeasurements={onToggleMeasurements}
+            isViewLocked={config.isViewLocked}
+            onToggleViewLock={onToggleViewLock}
           />
         )}
       </div>

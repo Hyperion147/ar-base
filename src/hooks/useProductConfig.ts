@@ -17,6 +17,7 @@ export const useProductConfig = () => {
     isOpen: true,
     openAmount: 1,
     panelCount: 2,
+    isViewLocked: false,
   });
 
   const updateProduct = (product: ProductType) => {
@@ -44,9 +45,9 @@ export const useProductConfig = () => {
   };
 
   const updateDimensions = (dimensions: Partial<ProductConfig['dimensions']>) => {
-    setConfig(prev => ({ 
-      ...prev, 
-      dimensions: { ...prev.dimensions, ...dimensions } 
+    setConfig(prev => ({
+      ...prev,
+      dimensions: { ...prev.dimensions, ...dimensions }
     }));
   };
 
@@ -67,15 +68,19 @@ export const useProductConfig = () => {
   };
 
   const updateOpenness = (amount: number) => {
-    setConfig(prev => ({ 
-      ...prev, 
+    setConfig(prev => ({
+      ...prev,
       openAmount: amount,
-      isOpen: amount > 0 
+      isOpen: amount > 0
     }));
   };
 
   const updatePanelCount = (count: number) => {
     setConfig(prev => ({ ...prev, panelCount: count }));
+  };
+
+  const toggleViewLock = () => {
+    setConfig(prev => ({ ...prev, isViewLocked: !prev.isViewLocked }));
   };
 
   return {
@@ -93,6 +98,7 @@ export const useProductConfig = () => {
     toggleMeasurements,
     updateOpenness,
     updatePanelCount,
+    toggleViewLock,
   };
 };
 

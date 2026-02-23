@@ -3,9 +3,16 @@ import { MdPhotoCamera, MdShare, MdDownload, MdSettings, MdHistory, MdTune } fro
 interface SettingsTabProps {
   showMeasurements: boolean;
   onToggleMeasurements: () => void;
+  isViewLocked: boolean;
+  onToggleViewLock: () => void;
 }
 
-export const SettingsTab = ({ showMeasurements, onToggleMeasurements }: SettingsTabProps) => {
+export const SettingsTab = ({
+  showMeasurements,
+  onToggleMeasurements,
+  isViewLocked,
+  onToggleViewLock
+}: SettingsTabProps) => {
   return (
     <div className="flex flex-col gap-10">
       {/* Visual Settings */}
@@ -26,17 +33,24 @@ export const SettingsTab = ({ showMeasurements, onToggleMeasurements }: Settings
             icon={<MdTune className="text-[#667eea]" />}
           />
           <ToggleItem
+            label="Lock 3D View"
+            description="Disable camera rotation for precise control"
+            checked={isViewLocked}
+            onChange={onToggleViewLock}
+            icon={<MdSettings className="text-[#667eea]" />}
+          />
+          <ToggleItem
             label="High Precision"
             description="Use ultra-sharp textures and shadows"
             checked={true}
-            onChange={() => {}}
+            onChange={() => { }}
             icon={<MdSettings className="text-[#667eea]" />}
           />
           <ToggleItem
             label="Auto-Rotation"
             description="Continuously rotate the preview model"
             checked={false}
-            onChange={() => {}}
+            onChange={() => { }}
             icon={<MdHistory className="text-[#667eea]" />}
           />
         </div>
@@ -44,7 +58,7 @@ export const SettingsTab = ({ showMeasurements, onToggleMeasurements }: Settings
 
       {/* Export Section */}
       <div>
-         <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <div className="w-1 h-4 bg-[#667eea]" />
           <h3 className="text-xs font-bold text-gray-900 uppercase tracking-[0.2em]">
             Export & Actions
@@ -115,8 +129,8 @@ const ToggleItem = ({ label, description, checked, onChange, icon }: ToggleItemP
         <p className="text-[10px] text-gray-400 font-medium">{description}</p>
       </div>
     </div>
-    
-    <button 
+
+    <button
       onClick={onChange}
       className={`
         relative w-12 h-6 transition-all duration-500 ease-in-out

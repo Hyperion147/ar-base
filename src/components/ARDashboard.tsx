@@ -10,7 +10,7 @@ export default function ARDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const viewerRef = useRef<{ enterAR: () => void }>(null);
-  
+
   const {
     config,
     updateProduct,
@@ -26,6 +26,7 @@ export default function ARDashboard() {
     toggleMeasurements,
     updateOpenness,
     updatePanelCount,
+    toggleViewLock,
   } = useProductConfig();
 
 
@@ -60,7 +61,7 @@ export default function ARDashboard() {
   return (
     <div className="flex h-screen w-screen bg-gray-50 relative overflow-hidden font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <IconSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      
+
       <ContentPanel
         activeTab={activeTab}
         config={config}
@@ -79,13 +80,15 @@ export default function ARDashboard() {
         onEnterAR={handleEnterAR}
         onUpdateOpenness={updateOpenness}
         onUpdatePanelCount={updatePanelCount}
+        onToggleViewLock={toggleViewLock}
       />
 
-      
-      <Viewer 
-        ref={viewerRef} 
-        config={config} 
-        onUpdateOpenness={updateOpenness} 
+
+      <Viewer
+        ref={viewerRef}
+        config={config}
+        onUpdateOpenness={updateOpenness}
+        isViewLocked={config.isViewLocked}
       />
 
 

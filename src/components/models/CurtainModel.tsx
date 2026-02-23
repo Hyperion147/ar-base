@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { Mesh, PlaneGeometry, Vector3 } from 'three';
 import { Text } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 
 type CurtainStyle = 'sheer' | 'blackout' | 'velvet' | 'linen';
 
@@ -21,10 +22,10 @@ interface CurtainModelProps {
   panelCount?: number;
 }
 
-export default function CurtainModel({ 
-  style, 
-  color, 
-  dimensions, 
+export default function CurtainModel({
+  style,
+  color,
+  dimensions,
   opacity,
   showMeasurements,
   openAmount,
@@ -53,7 +54,7 @@ export default function CurtainModel({
     let foldCount = 8;
     let foldDepth = 0.1;
     let fabricWeight = 1.0;
-    
+
     if (style === 'sheer') {
       foldCount = 12;
       foldDepth = 0.06;
@@ -71,53 +72,57 @@ export default function CurtainModel({
       foldDepth = 0.09;
       fabricWeight = 0.8;
     }
-    
+
     const widthSegments = 80;
     const heightSegments = 100;
     const geometry = new PlaneGeometry(1, 1, widthSegments, heightSegments);
     const pos = geometry.getAttribute('position');
     const v = new Vector3();
-    
+
     const gatherIntensity = 1.6 - openAmount * 0.8;
-    
+
     for (let i = 0; i < pos.count; i++) {
-        v.fromBufferAttribute(pos, i);
-        
-        const x = v.x + 0.5; 
-        const y = v.y + 0.5;
-        
-        // Vertical folds
-        const foldPhase = x * Math.PI * foldCount;
-        const foldWave = Math.sin(foldPhase);
-        const secondaryWave = Math.sin(foldPhase * 2.1) * 0.25;
-        
-        // Top is held by rod
-        const topConstraint = y > 0.90 ? Math.pow((1 - y) * 10, 2) : 1;
-        
-        // Custom pleating for different styles
-        let pleatEffect = 0;
-        if (style === 'velvet' || style === 'linen') {
-          // Double/Triple Pinch Pleat effect near the top
-          const pleatWave = Math.abs(Math.sin(foldPhase * 1.5)) * 0.4;
-          pleatEffect = pleatWave * (1 - topConstraint);
-        }
-        
-        // Bottom drapes naturally
-        const bottomWeight = Math.pow(1 - y, 0.8) * fabricWeight;
-        
-        const depth = (foldWave + secondaryWave + pleatEffect) * foldDepth * gatherIntensity * topConstraint * (0.3 + bottomWeight * 0.7);
-        
-        pos.setZ(i, depth);
+      v.fromBufferAttribute(pos, i);
+
+      const x = v.x + 0.5;
+      const y = v.y + 0.5;
+
+      // Vertical folds
+      const foldPhase = x * Math.PI * foldCount;
+      const foldWave = Math.sin(foldPhase);
+      const secondaryWave = Math.sin(foldPhase * 2.1) * 0.25;
+
+      // Top is held by rod
+      const topConstraint = y > 0.90 ? Math.pow((1 - y) * 10, 2) : 1;
+
+      // Custom pleating for different styles
+      let pleatEffect = 0;
+      if (style === 'velvet' || style === 'linen') {
+        // Double/Triple Pinch Pleat effect near the top
+        const pleatWave = Math.abs(Math.sin(foldPhase * 1.5)) * 0.4;
+        pleatEffect = pleatWave * (1 - topConstraint);
+      }
+
+      // Bottom drapes naturally
+      const bottomWeight = Math.pow(1 - y, 0.8) * fabricWeight;
+
+      const depth = (foldWave + secondaryWave + pleatEffect) * foldDepth * gatherIntensity * topConstraint * (0.3 + bottomWeight * 0.7);
+
+      pos.setZ(i, depth);
     }
-    
+
     geometry.computeVertexNormals();
     return geometry;
   }, [style, openAmount]);
 
   // Animate gentle breeze removed per request.
 
+  const animatedOpenAmount = useRef(openAmount);
+  const swayRotation = useRef(0);
+  const lastOpenAmount = useRef(openAmount);
+
   // Material properties based on fabric type
-  const getMaterialProps = () => {
+  const materialProps = useMemo(() => {
     const baseProps = {
       color,
       transparent: true,
@@ -127,8 +132,8 @@ export default function CurtainModel({
 
     switch (style) {
       case 'sheer':
-        return { 
-          ...baseProps, 
+        return {
+          ...baseProps,
           opacity: Math.min(opacity * 0.7, 0.8),
           roughness: 0.25,
           transmission: 0.9,
@@ -141,9 +146,9 @@ export default function CurtainModel({
           depthWrite: false,
         };
       case 'blackout':
-        return { 
-          ...baseProps, 
-          opacity: 1, 
+        return {
+          ...baseProps,
+          opacity: 1,
           roughness: 0.92,
           metalness: 0,
           sheen: 0.2,
@@ -152,12 +157,12 @@ export default function CurtainModel({
           envMapIntensity: 0.15,
         };
       case 'velvet':
-        return { 
-          ...baseProps, 
+        return {
+          ...baseProps,
           opacity: 1,
           roughness: 0.85,
-          sheen: 1.0, 
-          sheenColor: color, 
+          sheen: 1.0,
+          sheenColor: color,
           sheenRoughness: 0.2,
           clearcoat: 0.1,
           clearcoatRoughness: 0.4,
@@ -165,8 +170,8 @@ export default function CurtainModel({
         };
       case 'linen':
       default:
-        return { 
-          ...baseProps, 
+        return {
+          ...baseProps,
           opacity: Math.min(opacity, 0.98),
           roughness: 0.9,
           metalness: 0,
@@ -175,93 +180,101 @@ export default function CurtainModel({
           envMapIntensity: 0.4,
         };
     }
-  };
+  }, [style, color, opacity]);
 
-  // Calculate curtain panel positions
-  const fullPanelWidth = scale.width / panelCount;
-  
   // Different fabrics gather differently
-  let minWidthRatio = 0.18;
-  if (style === 'sheer') minWidthRatio = 0.12;
-  else if (style === 'velvet') minWidthRatio = 0.28;
-  else if (style === 'blackout') minWidthRatio = 0.22;
-  else if (style === 'linen') minWidthRatio = 0.16;
-  
-  const currentWidth = fullPanelWidth * (minWidthRatio + (1 - minWidthRatio) * openAmount);
-  
+  const minWidthRatio = useMemo(() => {
+    if (style === 'sheer') return 0.12;
+    if (style === 'velvet') return 0.28;
+    if (style === 'blackout') return 0.22;
+    return 0.16; // linen
+  }, [style]);
+
+  useFrame((_, delta) => {
+    // Smoothing: Lerp towards target openAmount
+    const lerpFactor = 1 - Math.pow(0.001, delta); // Resolution independent smoothing
+    animatedOpenAmount.current += (openAmount - animatedOpenAmount.current) * Math.min(lerpFactor * 5, 0.2);
+
+    // Realistic Sway Effect
+    const velocity = (animatedOpenAmount.current - lastOpenAmount.current) / delta;
+    lastOpenAmount.current = animatedOpenAmount.current;
+
+    const targetSway = -velocity * 0.05; // Amount of sway based on speed
+    swayRotation.current += (targetSway - swayRotation.current) * Math.min(lerpFactor * 3, 0.1);
+
+    // Apply sway to panels
+    curtainRefs.current.forEach((panel, i) => {
+      if (!panel) return;
+
+      // Panels at the edge sway slightly more than center ones for realism
+      const isLeft = i < Math.ceil(panelCount / 2);
+      const swayForce = swayRotation.current * (isLeft ? 1 : -1);
+      panel.rotation.y = swayForce;
+
+      // Update panel width and position
+      const fullPanelWidth = scale.width / panelCount;
+      const currentWidth = fullPanelWidth * (minWidthRatio + (1 - minWidthRatio) * animatedOpenAmount.current);
+      const panelGap = 0.002;
+
+      let xPos = 0;
+      if (isLeft) {
+        xPos = -scale.width / 2 + (i + 0.5) * currentWidth + (i * panelGap);
+      } else {
+        const j = panelCount - 1 - i;
+        xPos = scale.width / 2 - (j + 0.5) * currentWidth - (j * panelGap);
+      }
+
+      panel.position.x = xPos;
+      panel.scale.setX(currentWidth);
+
+      // Dynamic Fold Depth based on openness
+      // We update the geometry only when it actually changes much to save perf
+      // but for now let's use the memoized geometry which depends on prop openAmount.
+      // To make it truly smooth, we should update vertex positions based on animatedOpenAmount.
+      // However, updating 8k vertices per frame might be too much.
+      // Let's use a simpler approach: vary the mesh scale slightly for "billow"
+      panel.scale.z = 1 + Math.abs(swayRotation.current) * 0.5;
+    });
+  });
+
   const dropOffset = dimensions.drop / 100;
   const totalHeight = scale.height + dropOffset;
   const curtainY = -dropOffset / 2;
-
-  const leftCount = Math.ceil(panelCount / 2);
-
-  const panelsData = Array.from({ length: panelCount }).map((_, i) => {
-    const isLeft = i < leftCount;
-    let xPos = 0;
-    const staggerZ = i * 0.005; // Tiny Z offset to distinguish panels
-    const panelGap = 0.002; // Tiny gap
-    
-    if (isLeft) {
-      xPos = -scale.width / 2 + (i + 0.5) * currentWidth + (i * panelGap);
-    } else {
-      const j = panelCount - 1 - i;
-      xPos = scale.width / 2 - (j + 0.5) * currentWidth - (j * panelGap);
-    }
-    return { id: i, x: xPos, z: staggerZ, isLeft };
-  });
 
   return (
     <group position={[0, 0.5, -2.65]}>
       {/* Curtain Rod */}
       <mesh position={[0, scale.height / 2 + 0.08, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.018, 0.018, scale.width + 0.4, 32]} />
-        <meshStandardMaterial color="#c8c8c8" metalness={0.75} roughness={0.2} /> 
+        <meshStandardMaterial color="#c8c8c8" metalness={0.75} roughness={0.2} />
       </mesh>
 
       {/* Rod End Caps */}
       {[-1, 1].map((side) => (
         <group key={side} position={[side * (scale.width + 0.4) / 2, scale.height / 2 + 0.08, 0]}>
-          {/* Bracket */}
           <mesh position={[0, 0, -0.03]} castShadow>
             <boxGeometry args={[0.04, 0.05, 0.04]} />
-            <meshStandardMaterial color="#a8a8a8" metalness={0.6} roughness={0.3} /> 
+            <meshStandardMaterial color="#a8a8a8" metalness={0.6} roughness={0.3} />
           </mesh>
-          {/* Finial */}
           <mesh position={[side * 0.03, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
             <cylinderGeometry args={[0.022, 0.018, 0.05, 16]} />
-            <meshStandardMaterial color="#b8b8b8" metalness={0.7} roughness={0.25} /> 
+            <meshStandardMaterial color="#b8b8b8" metalness={0.7} roughness={0.25} />
           </mesh>
         </group>
       ))}
 
-      {/* Curtain Rings/Hooks */}
-      {Array.from({ length: Math.floor(scale.width * 6) }).map((_, i) => {
-        const ringSpacing = scale.width / Math.floor(scale.width * 6);
-        const xPos = -scale.width / 2 + i * ringSpacing + ringSpacing / 2;
-        return (
-          <mesh 
-            key={i}
-            position={[xPos, scale.height / 2 + 0.1, 0]} 
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <torusGeometry args={[0.01, 0.003, 8, 12]} />
-            <meshStandardMaterial color="#d0d0d0" metalness={0.85} roughness={0.15} />
-          </mesh>
-        );
-      })}
-
       {/* Curtain Panels */}
-      {panelsData.map((panel, i) => (
-        <mesh 
-          key={panel.id}
+      {Array.from({ length: panelCount }).map((_, i) => (
+        <mesh
+          key={i}
           ref={(el) => { if (el) curtainRefs.current[i] = el; }}
-          position={[panel.x, curtainY, panel.z]}
-          scale={[currentWidth, totalHeight, 1]}
+          position={[0, curtainY, 0]}
+          scale={[1, totalHeight, 1]}
           geometry={curtainGeometry}
           castShadow
           receiveShadow
         >
-          <meshPhysicalMaterial {...getMaterialProps()} />
+          <meshPhysicalMaterial {...materialProps} />
         </mesh>
       ))}
 

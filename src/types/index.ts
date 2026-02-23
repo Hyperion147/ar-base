@@ -30,6 +30,7 @@ export interface ProductConfig {
   isOpen: boolean;
   openAmount: number;
   panelCount: number;
+  isViewLocked: boolean;
 }
 
 
