@@ -1,4 +1,5 @@
 import type { IconType } from 'react-icons';
+import { Vector3, Matrix4 } from 'three';
 
 export type ProductType = 'curtain' | 'blind' | 'shade' | 'drape' | null;
 export type CurtainStyle = 'sheer' | 'blackout' | 'velvet' | 'linen';
@@ -38,4 +39,36 @@ export interface TabConfig {
   icon: IconType;
   iconOutlined: IconType;
   label: string;
+}
+
+// New types for corner detection workflow
+export interface WindowCorners {
+  topLeft: Vector3;
+  topRight: Vector3;
+  bottomLeft: Vector3;
+  bottomRight: Vector3;
+}
+
+export interface BoundingBox {
+  min: Vector3;
+  max: Vector3;
+  center: Vector3;
+}
+
+export interface SurfaceDetection {
+  corners: WindowCorners;
+  boundingBox: BoundingBox;
+  perspectiveMatrix: Matrix4;
+  surfaceArea: number;
+  normal: Vector3;
+}
+
+export type DetectionStage = 'idle' | 'detecting' | 'drawing' | 'completed';
+
+export interface CornerDetection {
+  corners: Vector3[];
+  stage: DetectionStage;
+  boundingBox: BoundingBox | null;
+  surfaceArea: number;
+  perspectiveMatrix: Matrix4 | null;
 }

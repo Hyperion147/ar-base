@@ -85,7 +85,8 @@ export default function ARDashboard() {
       <Viewer 
         ref={viewerRef} 
         config={config} 
-        onUpdateOpenness={updateOpenness} 
+        onUpdateOpenness={updateOpenness}
+        onSelectProduct={handleUpdateProduct}
       />
 
 
