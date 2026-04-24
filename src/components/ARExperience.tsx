@@ -200,7 +200,7 @@ export function ARExperience({ config, onARControlsChange, onCornerDetectionChan
         };
       }
     });
-  }, [validateCorners, calculateSurfaceArea, computeBoundingBox, onCornerDetectionChange, onSurfaceDetected]);
+  }, [validateCorners, calculateSurfaceArea, computeBoundingBox, computePerspectiveMatrix, onCornerDetectionChange, onSurfaceDetected]);
 
   const resetCornerDetection = useCallback(() => {
     setCornerDetection({

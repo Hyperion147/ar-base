@@ -1,13 +1,52 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    color: #21150f;
+    background:
+      radial-gradient(circle at top, #f7efe4 0%, #ecdcc9 42%, #d3bba1 100%);
+    font-family: "Aptos", "Segoe UI", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    overscroll-behavior-y: none;
+  }
+}
+
 body {
-  font-family: 'Poppins', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.font-serif {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
 }

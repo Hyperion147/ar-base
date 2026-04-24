@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import { Vector3, Matrix4 } from 'three';
+import { Matrix4, Vector3 } from 'three';
 
 export type ProductType = 'curtain' | 'blind' | 'shade' | 'drape' | null;
 export type CurtainStyle = 'sheer' | 'blackout' | 'velvet' | 'linen';
@@ -9,6 +9,9 @@ export type DrapeStyle = 'classic' | 'modern' | 'luxury' | 'minimal';
 export type MountType = 'inside' | 'outside';
 export type TextureType = 'smooth' | 'fabric' | 'woven';
 export type ActiveTab = 'products' | 'styles' | 'dimensions' | 'colors' | 'settings' | null;
+export type PreviewMode = 'studio' | 'camera';
+export type ScenePreset = 'gallery' | 'sunset' | 'midnight';
+export type QualityMode = 'balanced' | 'quality';
 
 export interface Dimensions {
   width: number;
@@ -31,8 +34,11 @@ export interface ProductConfig {
   isOpen: boolean;
   openAmount: number;
   panelCount: number;
+  previewMode: PreviewMode;
+  scenePreset: ScenePreset;
+  qualityMode: QualityMode;
+  autoRotate: boolean;
 }
-
 
 export interface TabConfig {
   id: string;
@@ -41,7 +47,6 @@ export interface TabConfig {
   label: string;
 }
 
-// New types for corner detection workflow
 export interface WindowCorners {
   topLeft: Vector3;
   topRight: Vector3;
