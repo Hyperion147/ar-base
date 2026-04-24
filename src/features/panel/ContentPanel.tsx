@@ -28,7 +28,6 @@ interface ContentPanelProps {
   onUpdatePanelCount: (count: number) => void;
 }
 
-
 export const ContentPanel = ({
   activeTab,
   config,

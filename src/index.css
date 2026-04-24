@@ -38,6 +38,66 @@ body {
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
 }
 
+.ui-flat-shell {
+  background-image:
+    linear-gradient(rgba(74, 52, 39, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 52, 39, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at top, #f7efe4 0%, #ecdcc9 42%, #d3bba1 100%);
+  background-size: 24px 24px, 24px 24px, auto;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+.ui-flat-shell,
+.ui-flat-shell * {
+  border-radius: 0 !important;
+}
+
+.ui-flat-shell > div > aside > div,
+.ui-flat-shell > div > main > div,
+.ui-flat-shell section,
+.ui-flat-shell button,
+.ui-flat-shell input,
+.ui-flat-shell .flat-panel {
+  box-shadow: none !important;
+}
+
+.ui-flat-shell > div > aside > div,
+.ui-flat-shell > div > main > div {
+  border-color: rgba(85, 59, 43, 0.32) !important;
+  background-image:
+    linear-gradient(rgba(85, 59, 43, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(85, 59, 43, 0.045) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.ui-flat-shell section {
+  border-style: dotted !important;
+  border-color: rgba(112, 84, 63, 0.4) !important;
+}
+
+.ui-flat-shell button {
+  border-color: rgba(99, 71, 52, 0.4) !important;
+}
+
+.ui-flat-shell button:hover {
+  background-image:
+    linear-gradient(rgba(99, 71, 52, 0.06), rgba(99, 71, 52, 0.06));
+}
+
+.ui-flat-shell input[type="number"],
+.ui-flat-shell input[type="color"],
+.ui-flat-shell input[type="range"] {
+  border-color: rgba(99, 71, 52, 0.45) !important;
+}
+
+.ui-flat-shell [class*="bg-white/"],
+.ui-flat-shell [class*="bg-[#fcfaf7]"],
+.ui-flat-shell [class*="bg-[#f8f1e7]"],
+.ui-flat-shell [class*="bg-[#f9f4ec]"],
+.ui-flat-shell [class*="bg-[#f3e7d8]"] {
+  backdrop-filter: none !important;
+}
+
 input,
 button,
 select,

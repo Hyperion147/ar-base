@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type {
   BlindStyle,
   CurtainStyle,
@@ -88,88 +88,88 @@ export const useProductConfig = () => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
   }, [config]);
 
-  const replaceConfig = (nextConfig: ProductConfig) => {
+  const replaceConfig = useCallback((nextConfig: ProductConfig) => {
     setConfig(mergeConfig(nextConfig));
-  };
+  }, []);
 
-  const resetConfig = () => {
+  const resetConfig = useCallback(() => {
     setConfig(DEFAULT_CONFIG);
-  };
+  }, []);
 
-  const updateProduct = (product: ProductType) => {
-    setConfig((prev) => ({ ...prev, selectedProduct: product }));
-  };
+  const updateProduct = useCallback((product: ProductType) => {
+    setConfig((prev) => (prev.selectedProduct === product ? prev : { ...prev, selectedProduct: product }));
+  }, []);
 
-  const updateCurtainStyle = (style: CurtainStyle) => {
-    setConfig((prev) => ({ ...prev, curtainStyle: style }));
-  };
+  const updateCurtainStyle = useCallback((style: CurtainStyle) => {
+    setConfig((prev) => (prev.curtainStyle === style ? prev : { ...prev, curtainStyle: style }));
+  }, []);
 
-  const updateBlindStyle = (style: BlindStyle) => {
-    setConfig((prev) => ({ ...prev, blindStyle: style }));
-  };
+  const updateBlindStyle = useCallback((style: BlindStyle) => {
+    setConfig((prev) => (prev.blindStyle === style ? prev : { ...prev, blindStyle: style }));
+  }, []);
 
-  const updateShadeStyle = (style: ShadeStyle) => {
-    setConfig((prev) => ({ ...prev, shadeStyle: style }));
-  };
+  const updateShadeStyle = useCallback((style: ShadeStyle) => {
+    setConfig((prev) => (prev.shadeStyle === style ? prev : { ...prev, shadeStyle: style }));
+  }, []);
 
-  const updateDrapeStyle = (style: DrapeStyle) => {
-    setConfig((prev) => ({ ...prev, drapeStyle: style }));
-  };
+  const updateDrapeStyle = useCallback((style: DrapeStyle) => {
+    setConfig((prev) => (prev.drapeStyle === style ? prev : { ...prev, drapeStyle: style }));
+  }, []);
 
-  const updateColor = (color: string) => {
-    setConfig((prev) => ({ ...prev, color }));
-  };
+  const updateColor = useCallback((color: string) => {
+    setConfig((prev) => (prev.color === color ? prev : { ...prev, color }));
+  }, []);
 
-  const updateDimensions = (dimensions: Partial<ProductConfig['dimensions']>) => {
+  const updateDimensions = useCallback((dimensions: Partial<ProductConfig['dimensions']>) => {
     setConfig((prev) => ({
       ...prev,
       dimensions: { ...prev.dimensions, ...dimensions },
     }));
-  };
+  }, []);
 
-  const updateMountType = (mountType: MountType) => {
-    setConfig((prev) => ({ ...prev, mountType }));
-  };
+  const updateMountType = useCallback((mountType: MountType) => {
+    setConfig((prev) => (prev.mountType === mountType ? prev : { ...prev, mountType }));
+  }, []);
 
-  const updateOpacity = (opacity: number) => {
-    setConfig((prev) => ({ ...prev, opacity }));
-  };
+  const updateOpacity = useCallback((opacity: number) => {
+    setConfig((prev) => (prev.opacity === opacity ? prev : { ...prev, opacity }));
+  }, []);
 
-  const updateTexture = (texture: TextureType) => {
-    setConfig((prev) => ({ ...prev, texture }));
-  };
+  const updateTexture = useCallback((texture: TextureType) => {
+    setConfig((prev) => (prev.texture === texture ? prev : { ...prev, texture }));
+  }, []);
 
-  const toggleMeasurements = () => {
+  const toggleMeasurements = useCallback(() => {
     setConfig((prev) => ({ ...prev, showMeasurements: !prev.showMeasurements }));
-  };
+  }, []);
 
-  const updateOpenness = (amount: number) => {
+  const updateOpenness = useCallback((amount: number) => {
     setConfig((prev) => ({
       ...prev,
       openAmount: amount,
       isOpen: amount > 0.05,
     }));
-  };
+  }, []);
 
-  const updatePanelCount = (count: number) => {
-    setConfig((prev) => ({ ...prev, panelCount: count }));
-  };
+  const updatePanelCount = useCallback((count: number) => {
+    setConfig((prev) => (prev.panelCount === count ? prev : { ...prev, panelCount: count }));
+  }, []);
 
-  const updatePreviewMode = (previewMode: PreviewMode) => {
-    setConfig((prev) => ({ ...prev, previewMode }));
-  };
+  const updatePreviewMode = useCallback((previewMode: PreviewMode) => {
+    setConfig((prev) => (prev.previewMode === previewMode ? prev : { ...prev, previewMode }));
+  }, []);
 
-  const updateScenePreset = (scenePreset: ScenePreset) => {
-    setConfig((prev) => ({ ...prev, scenePreset }));
-  };
+  const updateScenePreset = useCallback((scenePreset: ScenePreset) => {
+    setConfig((prev) => (prev.scenePreset === scenePreset ? prev : { ...prev, scenePreset }));
+  }, []);
 
-  const updateQualityMode = (qualityMode: QualityMode) => {
-    setConfig((prev) => ({ ...prev, qualityMode }));
-  };
+  const updateQualityMode = useCallback((qualityMode: QualityMode) => {
+    setConfig((prev) => (prev.qualityMode === qualityMode ? prev : { ...prev, qualityMode }));
+  }, []);
 
-  const toggleAutoRotate = () => {
+  const toggleAutoRotate = useCallback(() => {
     setConfig((prev) => ({ ...prev, autoRotate: !prev.autoRotate }));
-  };
+  }, []);
 
   return {
     config,
