@@ -107,6 +107,7 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({ config, mode, cap
   const streamRef = useRef<MediaStream | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [mirrorCamera, setMirrorCamera] = useState(false);
 
   const wantsCamera = mode === 'live' || mode === 'ar';
 
@@ -146,6 +147,8 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({ config, mode, cap
         }
 
         streamRef.current = stream;
+        const [track] = stream.getVideoTracks();
+        setMirrorCamera(track?.getSettings().facingMode === 'user');
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
@@ -163,6 +166,7 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({ config, mode, cap
       cancelled = true;
       stopCameraStream();
       setCameraReady(false);
+      setMirrorCamera(false);
     };
   }, [stopCameraStream, wantsCamera]);
 
@@ -212,7 +216,7 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({ config, mode, cap
     <div ref={shellRef} className="relative h-full min-h-[420px] overflow-hidden border border-white/60 bg-[#d6c8b4]">
       {wantsCamera && (
         <div className="absolute inset-0 bg-[#120f0b]">
-          <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+          <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" style={{ transform: mirrorCamera ? 'scaleX(-1)' : 'none' }} />
           {!cameraReady && !cameraError && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/45 px-6 text-center text-xs uppercase tracking-[0.24em] text-white/80 sm:text-sm sm:tracking-[0.28em]">
               Starting live camera preview

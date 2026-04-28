@@ -745,6 +745,7 @@ function CaptureWorkspace({ onConfirmed }: { onConfirmed: (image: string, frame:
   const [cameraRequested, setCameraRequested] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [mirrorCamera, setMirrorCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [points, setPoints] = useState<FramePoint[]>([]);
 
@@ -770,6 +771,8 @@ function CaptureWorkspace({ onConfirmed }: { onConfirmed: (image: string, frame:
         }
 
         streamRef.current = stream;
+        const [track] = stream.getVideoTracks();
+        setMirrorCamera(track?.getSettings().facingMode === 'user');
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
@@ -787,6 +790,7 @@ function CaptureWorkspace({ onConfirmed }: { onConfirmed: (image: string, frame:
       cancelled = true;
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
+      setMirrorCamera(false);
     };
   }, [cameraRequested]);
 
@@ -797,6 +801,10 @@ function CaptureWorkspace({ onConfirmed }: { onConfirmed: (image: string, frame:
     canvas.height = videoRef.current.videoHeight || 720;
     const context = canvas.getContext('2d');
     if (!context) return;
+    if (mirrorCamera) {
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+    }
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     setCapturedImage(canvas.toDataURL('image/jpeg', 0.92));
     setPoints([]);
@@ -884,7 +892,7 @@ function CaptureWorkspace({ onConfirmed }: { onConfirmed: (image: string, frame:
       <div className="relative flex-1 bg-[#1b140f]">
         {!capturedImage && cameraRequested && (
           <>
-            <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+            <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" style={{ transform: mirrorCamera ? 'scaleX(-1)' : 'none' }} />
             {!cameraReady && !cameraError && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 px-6 text-center text-xs uppercase tracking-[0.24em] text-white/80 sm:text-sm">
                 Opening camera for site capture
